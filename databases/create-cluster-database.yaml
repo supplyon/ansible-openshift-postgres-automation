@@ -1,0 +1,52 @@
+- hosts: localhost
+  vars_prompt:
+    - name: "POSTGRESQL_ADMIN_PW"
+      prompt: "PostgreSQL Admin Password"
+      private: yes
+    - name: "DATABASE_NAME"
+      prompt: "Name of the database and role you want to create"
+      private: no
+    - name: "ROLE_PASSWORD"
+      prompt: "Password for the role"
+      private: yes
+    - name: "NAMESPACE"
+      prompt: "Namespace the database instance is running in"
+  tasks:
+  - name: Get PostgreSQL Pod
+    shell: "oc get pods -n {{ NAMESPACE }} | grep postgresql | awk '{print $1}'"
+    register: pod_name
+
+  - name: Port forward connection
+    shell: "nohup oc port-forward {{ pod_name.stdout}} 5432:5432 -n {{ NAMESPACE }} > /dev/null 2>&1 & echo $! > run.pid"
+
+  - name: Create Database for microservice
+    postgresql_db:
+      name: "{{ DATABASE_NAME }}"
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+
+  - name: Revoke connect from public
+    postgresql_privs:
+      database: "{{ DATABASE_NAME }}"
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+      roles: PUBLIC
+      privs: CONNECT
+      type: database
+
+  - name: Create role
+    postgresql_user:
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+      db: "{{ DATABASE_NAME }}"
+      name: "{{ DATABASE_NAME }}"
+      password: "{{ ROLE_PASSWORD }}"
+      expires: infinity
+      conn_limit: 100
+      priv: ALL
+ 
+  - name: kill port forward
+    shell: kill $(cat run.pid) && rm -f run.pid 
