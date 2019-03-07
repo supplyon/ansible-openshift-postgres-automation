@@ -11,6 +11,7 @@
       private: yes
     - name: "NAMESPACE"
       prompt: "Namespace the database instance is running in"
+      private: no
   tasks:
   - name: Get PostgreSQL Pod
     shell: "oc get pods -n {{ NAMESPACE }} | grep postgresql | awk '{print $1}'"
