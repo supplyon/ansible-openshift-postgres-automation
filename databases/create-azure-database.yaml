@@ -1,0 +1,30 @@
+- hosts: localhost
+  tasks:
+  - name: Create Database for microservice
+    postgresql_db:
+      name: "{{ DATABASE_NAME }}"
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+
+  - name: Revoke connect from public
+    postgresql_privs:
+      database: "{{ DATABASE_NAME }}"
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+      roles: PUBLIC
+      privs: CONNECT
+      type: database
+
+  - name: Create role
+    postgresql_user:
+      login_host: localhost
+      login_user: postgres
+      login_password: "{{ POSTGRESQL_ADMIN_PW }}"
+      db: "{{ DATABASE_NAME }}"
+      name: "{{ DATABASE_NAME }}"
+      password: "{{ ROLE_PASSWORD }}"
+      expires: infinity
+      conn_limit: 100
+      priv: ALL

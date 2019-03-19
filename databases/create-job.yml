@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-azure-database
+spec:
+  parallelism: 1
+  completions: 1
+  backoffLimit: 1
+  template:
+    metadata:
+      name: create-azure-database
+    spec:
+      containers:
+      - name: docker-alpine-ansible
+        image: rndmh3ro/docker-alpine-ansible
+        command: ["/bin/sh", "-c"]
+        args: ["ansible-playbook /opt/create-azure-database.yaml -C"]
+        volumeMounts:
+        - name: ansible-playbook-cm
+          mountPath: /opt/
+      restartPolicy: OnFailure
+      volumes:
+      - name: ansible-playbook-cm
+        configMap:
+          name: ansible-playbook-create-azure-database

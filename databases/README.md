@@ -9,3 +9,10 @@
 * `pip install psycopg2`
 * `ansible-playbook create-cluster-database.yaml`
 * Pass required params to the playbook 
+
+
+# create azure database
+
+* use config map for ansible-playbook - manually created -> oc get cm ansible-playbook-create-azure-database
+* oc project dev
+* oc create -f create-job.yaml
