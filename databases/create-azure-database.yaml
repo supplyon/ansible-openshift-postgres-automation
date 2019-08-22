@@ -1,4 +1,14 @@
 - hosts: localhost
+  vars_prompt:
+    - name: "POSTGRESQL_ADMIN_PW"
+      prompt: "PostgreSQL Admin Password"
+      private: yes
+    - name: "DATABASE_NAME"
+      prompt: "Name of the database and role you want to create"
+      private: no
+    - name: "ROLE_PASSWORD"
+      prompt: "Password for the role"
+      private: yes
   tasks:
   - name: Create Database for microservice
     postgresql_db:
