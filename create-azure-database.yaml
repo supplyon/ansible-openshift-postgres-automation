@@ -10,7 +10,7 @@
       prompt: "Password for the role"
       private: yes
   tasks:
-  - name: Create Database for microservice
+  - name: Create Database
     postgresql_db:
       name: "{{ DATABASE_NAME }}"
       login_host: localhost
