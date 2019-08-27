@@ -20,7 +20,7 @@
   - name: Port forward connection
     shell: "nohup oc port-forward {{ pod_name.stdout}} 5432:5432 -n {{ NAMESPACE }} > /dev/null 2>&1 & echo $! > run.pid"
 
-  - name: Create Database for microservice
+  - name: Create Database
     postgresql_db:
       name: "{{ DATABASE_NAME }}"
       login_host: localhost
@@ -48,6 +48,6 @@
       expires: infinity
       conn_limit: 100
       priv: ALL
- 
+
   - name: kill port forward
-    shell: kill $(cat run.pid) && rm -f run.pid 
+    shell: kill $(cat run.pid) && rm -f run.pid
